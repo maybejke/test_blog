@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}
+    {{ post.author }} - {{ post.title }}
+{% endblock %}
+
+{% block content %}
+    {% include 'blog/snippets/post_detail_snippet.html' %}
+
+    {% with comments.count as total_comments %}
+        <h2> {{ total_comments }} total {{ total_comments|pluralize }}</h2>
+    {% endwith %}
+
+    {% for comment in comments %}
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title"> {{ comment.body|linebreaks }}
+                </h5>
+                <div>
+                    <p>
+                        Comment {{ forloop.counter }} by {{ comment.name }}<br>
+                        {{ comment.created }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <p> No comments yet.</p>
+    {% endfor %}
+
+    {% if new_comment %}
+        <h2> Your comment has been added.</h2>
+    {% else %}
+        <h2> Add new comment:</h2>
+        <form action="." method="post">
+            {% csrf_token %}
+            {{ comment_form.as_p }}
+            <input type="submit" value="Add comment">
+        </form>
+    {% endif %}
+
+{% endblock %}

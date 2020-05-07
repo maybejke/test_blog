@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    Blog home
+{% endblock %}
+
+{% block content %}
+
+    {% for post in page_obj %}
+        <div class="row">
+            <div class="col-lg-8 mt-5 offset-lg-2">
+                {% include 'blog/snippets/post_snippet.html' %}
+            </div>
+        </div>
+    {% endfor %}
+        <div class="row">
+            <div class="col-lg-4 mt-5 offset-lg-4">
+    {% include 'blog/snippets/index_pagination.html' %}
+            </div>
+        </div>
+
+{% endblock %}

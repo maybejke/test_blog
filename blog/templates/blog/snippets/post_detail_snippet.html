@@ -1,0 +1,14 @@
+{% load static %}
+
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">{{ post.title }}</h5>
+        <p class="card-text">{{ post.body|truncatewords:30|linebreaks }}</p>
+        <a href="{{ post.get_absolute_url }}" class="btn btn-primary">read more</a>
+        <p> Published {{ post.publish }} by {{ post.author }}</p>
+        <p>
+            <a href="{% url 'post_share' post.id %}">Sent this Post.</a>
+        </p>
+    </div>
+</div>
