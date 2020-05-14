@@ -7,17 +7,29 @@
 
 {% block content %}
 
+
+    {% if tag %}
+        <h2> Post tagged with "{{ tag.name }}"</h2>
+    {% endif %}
     {% for post in page_obj %}
+        <div class="row">
+            <div class="col-lg-8 mt-5 offset-lg-2">
+                Tags:
+                    {% for tag in post.tags.all %}
+                        <a href="{{ post.get_tag_url }}">{{ tag.name }}</a>,
+                    {% endfor %}
+            </div>
+        </div>
         <div class="row">
             <div class="col-lg-8 mt-5 offset-lg-2">
                 {% include 'blog/snippets/post_snippet.html' %}
             </div>
         </div>
     {% endfor %}
-        <div class="row">
-            <div class="col-lg-4 mt-5 offset-lg-4">
-    {% include 'blog/snippets/index_pagination.html' %}
-            </div>
+    <div class="row">
+        <div class="col-lg-4 mt-5 offset-lg-4">
+            {% include 'blog/snippets/index_pagination.html' %}
         </div>
+    </div>
 
 {% endblock %}

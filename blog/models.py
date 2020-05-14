@@ -3,12 +3,15 @@ from django.utils import timezone
 from django.urls import reverse
 from django.contrib.auth.models import User
 
+from taggit.managers import TaggableManager
+
 
 # Create your models here.
 
 class Post(models.Model):
     """
-    model for Post
+    model for Post,
+    using TaggableManager for add, delete, get Tags
     """
     STATUS_CHOISES = (
         ('draft', 'Draft'),
@@ -28,6 +31,8 @@ class Post(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOISES, default='draft')
+    # taggable manager can add, delete, get tags from the objects.
+    tags = TaggableManager()
 
     def __str__(self):
         return f'{self.title}'
@@ -38,11 +43,12 @@ class Post(models.Model):
                                               'month': self.publish.month,
                                               'day': self.publish.day})
 
-    # def get_comment_save(self):
-    #     return reverse('save_comment', kwargs={'slug': self.slug,
-    #                                            'year': self.publish.year,
-    #                                            'month': self.publish.month,
-    #                                            'day': self.publish.day})
+    def get_tag_url(self):
+        return reverse('index_list_by_tag', kwargs={'slug': self.tags.slugs()[0]})
+    #
+    # def get_tag_url(self):
+    #     print(f' slugs: {self.tags.slug}')
+    #     return reverse('index_list_by_tag', kwargs={'slug': self.tags.slug})
 
 
 class Comment(models.Model):
