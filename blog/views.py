@@ -2,6 +2,9 @@ from django.shortcuts import get_object_or_404, render
 from django.views.generic import DetailView, ListView
 from django.core.mail import send_mail
 from django.conf import settings
+from django.db.models import Count
+
+from taggit.models import Tag
 
 from .models import Post, Comment
 from .forms import EmailPostForm, CommentForm
@@ -14,8 +17,21 @@ class IndexView(ListView):
     template_name = 'blog/index.html'  # template name
     model = Post  # model for context - Post.objects.all()
     paginate_by = 2  # pagination by 2 posts
-    queryset = model.objects.filter(status__iexact='published')  # queryset for only published posts
+    queryset = model.objects.filter(status__iexact='published') # queryset for only published posts
     # context_object_name = posts # if we need to change context from 'object_list' to something
+    tag = None
+
+    def get_queryset(self):
+        # if got kwargs > redirect to 'tag/<str:slug>/' and creatind qs with filter tag.slug
+        if self.kwargs:
+            # getting tag for kwargs (in model function "get_tag_url")
+            self.tag = get_object_or_404(Tag, slug=self.kwargs.get('slug'))
+            # filtering qs with tags
+            qs = self.queryset.filter(tags__in=[self.tag])
+            return qs
+        else:
+            # if index page and not slug filter
+            return self.queryset
 
 
 class PostDetail(DetailView):
@@ -31,10 +47,19 @@ class PostDetail(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(PostDetail, self).get_context_data(**kwargs)
+        post = self.get_queryset().get()
+        # getting id current post's tag <QuerySet [3]>
+        post_tags_ids = post.tags.values_list('id', flat=True)
+        # filtering posts by tags in list post_tags_ids, and excluding current post.
+        similar_post = self.model.objects.filter(tags__in=post_tags_ids).exclude(id=post.id)
+        # top 4 post, by similar tags
+        similar_post = similar_post.annotate(same_tags=Count('tags')).order_by('-same_tags', '-publish')[:4]
         context['comment_form'] = CommentForm
-        # from QuerySet of Posts, method get() getting a object, then we getting by related_name comments and
+        # from QuerySet of Posts, method get() getting an object, then we getting by related_name comments and
         # filtering them active = True
         context['comments'] = self.get_queryset().get().comments.filter(active=True)
+        print(similar_post)
+        context['similar_posts'] = similar_post
         return context
 
     def post(self, request, *args, **kwargs):
