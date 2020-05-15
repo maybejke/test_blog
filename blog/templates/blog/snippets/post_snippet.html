@@ -1,11 +1,12 @@
 {% load static %}
+{% load blog_tags %}
 
 
 <div class="card">
     <div class="card-body">
         <h5 class="card-title">{{ post.title }}</h5>
         <h6 class="cart-title" style="font-style: italic">Tags: {{ post.tags.all|join:", " }}</h6>
-        <p class="card-text">{{ post.body }}</p>
+        <p class="card-text">{{ post.body|markdown|truncatewords:30 }}</p>
         <a href="{{ post.get_absolute_url }}" class="btn btn-primary">read more</a>
     </div>
 </div>
