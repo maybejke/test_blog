@@ -1,10 +1,10 @@
 {% load static %}
-
+{% load blog_tags %}
 
 <div class="card">
     <div class="card-body">
         <h5 class="card-title">{{ post.title }}</h5>
-        <p class="card-text">{{ post.body|truncatewords:30|linebreaks }}</p>
+        <p class="card-text">{{ post.body|markdown }}</p>
         <a href="{{ post.get_absolute_url }}" class="btn btn-primary">read more</a>
         <p> Published {{ post.publish }} by {{ post.author }}</p>
         <p>
